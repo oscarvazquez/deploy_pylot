@@ -24,13 +24,16 @@ class MySQLConnection(object):
         self.conn = mysql.connector.connect(**dbconfig)
 
     def query_db(self, query, data=None):
-        cursor = self.conn.cursor(dictionary=True)
+        cursor = self.conn.cursor()
         data = cursor.execute(query, data)
+        columns = tuple( [d[0].decode('utf8') for d in cursor.description] )
         if query[0:6].lower() != 'select':
             self.conn.commit()
             return
         else:
-            result = list(cursor.fetchall())
+            for row in cursor:
+                result.append(dict(zip(columns, row)))
+            cursor.close()
             return _convert(result)
 
 def connect(config):
