@@ -14,9 +14,9 @@ class Welcome(Controller):
         """
             This is an example of loading a model.
             Every controller has access to the load_model method.
-
-            self.load_model('WelcomeModel')
         """
+        self.load_model('WelcomeModel')
+        self.db = self._app.db
 
     """ This is an example of a controller method that will load a view for the client """
     def index(self):
@@ -24,4 +24,6 @@ class Welcome(Controller):
         A loaded model is accessible through the models attribute 
         self.models['WelcomeModel'].get_all_users()
         """
-        return self.load_view('index.html')
+        self.models['WelcomeModel'].add_post()
+        posts = self.models['WelcomeModel'].grab_posts()
+        return self.load_view('index.html', posts=posts)

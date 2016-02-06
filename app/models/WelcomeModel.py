@@ -14,10 +14,17 @@ class WelcomeModel(Model):
         super(WelcomeModel, self).__init__()
     """
     Below is an example of a model method that queries the database for all users in a fictitious application
-
-    def get_all_users(self):
-        print self.db.query_db("SELECT * FROM users")
-
+    """
+    def add_post(self):
+        Post = self.models_name['Post']
+        post = Post('oscar', 'this is something exciting title')
+        self.db.session.add(post)
+        self.db.session.commit()
+        return post
+    def grab_posts(self):
+        Post = self.db.session.execute("SELECT * FROM post where id = :user_id", {'user_id': 10})
+        return Post
+    """
     Every model has access to the "self.db.query_db" method which allows you to interact with the database
     """
 
