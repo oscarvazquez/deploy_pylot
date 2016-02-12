@@ -8,16 +8,13 @@ class DBConfig(object):
     """ DB_ON must be True to use the DB! """
     DB_ON = True
     DB_DRIVER = 'mysql'
-    DB_ORM = True
-    if "SQLAlchemy_DATABASE_URI" in os.environ:
-        SQLALCHEMY_DATABASE_URI = os.environ['SQLAlchemy_DATABASE_URI']
-        print SQLALCHEMY_DATABASE_URI
+    DB_ORM = False
 
 """ Put Development Specific Configurations here """
 class DevelopmentDBConfig(DBConfig):
     DB_USERNAME = 'root'
     DB_PASSWORD = 'root'
-    DB_DATABASE_NAME = 'new_oscar'
+    DB_DATABASE_NAME = 'red'
     DB_HOST = 'localhost'
     DB_PORT = 3306
     """ unix_socket is used for connecting with MAMP. Take this out if you aren't using MAMP """

@@ -4,10 +4,9 @@
   </head>
   <body>
     The best place to start is the "WelcomeController.py" file in app/controllers.
-    {{posts}}
     {% for x in posts %}
-    	<p>{{x.title}}</p>
-    	<p>{{x.body}}</p>
+    	<p>{{x.quote}}</p>
+    	<p>{{x.author}}</p>
     {% endfor %}
   </body>
 </html>

@@ -1,5 +1,8 @@
 import mysql.connector
 import collections
+import inspect
+import models
+from flask.ext.sqlalchemy import SQLAlchemy
 
 def _convert(data):
     if isinstance(data, basestring):
@@ -11,30 +14,34 @@ def _convert(data):
     else:
         return data
 
-class MySQLConnection(object):
-    def __init__(self, config):
-        dbconfig = {
-            'user': config.DB_USERNAME,
-            'password': config.DB_PASSWORD,
-            'database': config.DB_DATABASE_NAME,
-            'host': config.DB_HOST,
-            'port': config.DB_PORT,
-        }
-        dbconfig.update(config.DB_OPTIONS)
-        self.conn = mysql.connector.connect(**dbconfig)
 
-    def query_db(self, query, data=None):
-        cursor = self.conn.cursor()
-        data = cursor.execute(query, data)
-        columns = tuple( [d[0].decode('utf8') for d in cursor.description] )
+
+def connect(config, app):
+    dbconfig = {
+        'user': config.DB_USERNAME,
+        'password': config.DB_PASSWORD,
+        'database': config.DB_DATABASE_NAME,
+        'host': config.DB_HOST,
+        'port': config.DB_PORT,
+    }
+    dbconfig.update(config.DB_OPTIONS)
+    app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + str(config.DB_USERNAME) + ":" + str(config.DB_PASSWORD) + "@127.0.0.1:" + str(config.DB_PORT) + "/" + config.DB_DATABASE_NAME
+    for name, obj in inspect.getmembers(models):
+        if inspect.isclass(obj):
+            setattr(app, name, obj)
+    db = SQLAlchemy(app)
+
+    def _query_db(query):
+        result = db.session.execute(query)
         if query[0:6].lower() != 'select':
-            self.conn.commit()
-            return
+            app.db.session.commit()
+            return True
         else:
-            for row in cursor:
-                result.append(dict(zip(columns, row)))
-            cursor.close()
-            return _convert(result)
+            return result
 
-def connect(config):
-    return MySQLConnection(config)
+    db.query_db = _query_db
+    return db
+
+
+
+

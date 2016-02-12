@@ -5,7 +5,6 @@
     The "db" object can be used by all of the models to interact with the database
 """
 from app.config import database
-from flask.ext.sqlalchemy import SQLAlchemy
 import importlib
 import os
 
@@ -20,15 +19,12 @@ def init_db(app):
     config = _get_config(os.getenv('PYLOT_ENV', 'DEVELOPMENT'))
 
     if config.DB_ON:
-        if config.DB_ORM:
-            # TODO: Add in SQLAlchemy configurations here
-            app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://" + str(config.DB_USERNAME) + ":" + str(config.DB_PASSWORD) + "@127.0.0.1:" + str(config.DB_PORT) + "/" + config.DB_DATABASE_NAME
-            app.config['SQLALCHEMY_ECHO'] = True
-            db = SQLAlchemy(app)
-            app.db = db
-        else:
-            driver_file = 'system.db.drivers._'+config.DB_DRIVER
-            db_connector = importlib.import_module(driver_file)
-            db = db_connector.connect(config)
-            app.db = db
-            app.config['DB_ORM'] = False
+        driver_file = 'system.db.drivers._' + config.DB_DRIVER
+        db_connector = importlib.import_module(driver_file)
+        #TODO: FIX THIS
+        if not db_connector:
+            raise Exception('Right now we do not have support for #{driver_file}') # fix this 
+        app.config['SQLALCHEMY_ECHO'] = True
+        db = db_connector.connect(config, app)
+        app.db = db
+
