@@ -3,6 +3,7 @@ import collections
 import inspect
 import models
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
 
 def _convert(data):
     if isinstance(data, basestring):
@@ -31,15 +32,20 @@ def connect(config, app):
             setattr(app, name, obj)
     db = SQLAlchemy(app)
 
-    def _query_db(query):
-        result = db.session.execute(query)
+    def _query_db(query, data=None):
+        result = db.session.execute(text(query), data)
         if query[0:6].lower() != 'select':
             app.db.session.commit()
             return True
         else:
             return result
 
+    def _get_one(query, data=None):
+        result = db.session.execute(text(query), data).fetchone()
+        return result
+
     db.query_db = _query_db
+    db.get_one = _get_one
     return db
 
 

@@ -15,13 +15,25 @@ class WelcomeModel(Model):
     """
     Below is an example of a model method that queries the database for all users in a fictitious application
     """
+
+    """  
     def add_post(self):
-        self.db.query_db("INSERT into quotes (quote, author, users_idusers) values('with new query styl', 'aThis is all working now and im awesome', 1)")
+        sql = "INSERT into messages (message, created_at, users_id) values(:message, NOW(), :users_id)"
+        data = {'message': 'awesome bro', 'users_id': 1}
+        self.db.query_db(sql, data)
+        
         return True
     
     def grab_posts(self):
-        return self.db.query_db("SELECT * from quotes")
-    
+        query = "SELECT * from messages where users_id = :user_id"
+        data = {'user_id':1}
+        return self.db.query_db(query, data)
+
+    def get_user(self):
+        query = "SELECT * from users where id = :id"
+        data = {'id': 1}
+        return self.db.query_db(query, data).fetchone()
+    """
     """
     Every model has access to the "self.db.query_db" method which allows you to interact with the database
     """
